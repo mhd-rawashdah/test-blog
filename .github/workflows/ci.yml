@@ -1,0 +1,62 @@
+name: CI on Nx.dev affected apps and libs
+
+on:
+  push:
+    branches: ['main']
+  pull_request:
+    branches: ['main', 'develop']
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: 'read'
+      actions: 'read'
+      repository-projects: 'read'
+    env:
+      GITHUB_TOKEN: ${{ secrets.SEMANTIC_RELEASE }}
+
+    strategy:
+      matrix:
+        node-version: [16.17.0]
+
+    steps:
+      - uses: actions/checkout@v3
+        with:
+          fetch-depth: 0
+          persist-credentials: false
+      - name: Use Node.js ${{ matrix.node-version }}
+        uses: actions/setup-node@v3
+        with:
+          node-version: ${{ matrix.node-version }}
+
+      - name: Derive appropriate SHAs for base and head for `nx affected` commands
+        id: setSHAs
+        uses: nrwl/nx-set-shas@v3
+      - run: |
+          echo "BASE: ${{ steps.setSHAs.outputs.base }}"
+          echo "HEAD: ${{ steps.setSHAs.outputs.head }}"
+
+      - name: Install
+        run: |
+          yarn install
+
+      - name: Lint
+        run: |
+          yarn run affected:lint
+
+      - name: Test
+        run: |
+          yarn run affected:test
+
+      - name: Build
+        run: |
+          yarn run affected:build
+
+      - name: CI Debug
+        run: |
+          echo "NA"
+
+      - name: Release
+        run: |
+          npx semantic-release
