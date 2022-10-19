@@ -72,11 +72,24 @@
         "@semantic-release/github",
         {
           "assets": [
-            "dist/**"
+            {
+              "path":  "dist/**",
+              "name": "dist"
+            }
           ]
         }
       ],
-      "@semantic-release/git"
+      [
+        "@semantic-release/git",
+        {
+          "assets": [
+            "dist/**/*.{js,css}",
+            "docs",
+            "package.json"
+          ],
+          "message": "chore(release): ${nextRelease.version} from ${branch} [skip ci]\n\n${nextRelease.notes}"
+        }
+      ]
     ],
     "preset": "angular"
   }
