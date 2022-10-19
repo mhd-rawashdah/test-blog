@@ -73,8 +73,9 @@
         {
           "assets": [
             {
-              "path":  "dist/**",
-              "name": "dist"
+              "path":  "dist/**/*",
+              "name": "dist",
+              "label": "Artifacts files"
             }
           ]
         }
